@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# 运行期产物，不入库
+workspace/
+data-manifest.yaml
+environment.yaml
+bindings.json
+*.log
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

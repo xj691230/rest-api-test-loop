@@ -1,0 +1,81 @@
+{
+  "$comment": "用例文件格式定义。cases.json 是数组，每个元素是一条用例。",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "endpoint", "class", "priority", "request", "assertions"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "唯一标识，建议格式：METHOD /path__场景，如 POST /api/orders__missing_price"
+      },
+      "endpoint": {
+        "type": "string",
+        "description": "METHOD + path，如 POST /api/orders"
+      },
+      "class": {
+        "type": "string",
+        "enum": ["happy_path", "required", "type", "boundary", "length_format", "enum", "auth", "not_found", "conflict", "idempotent", "pagination", "security", "contract", "performance", "ratelimit"],
+        "description": "对应 references/case-matrix.md 的类别"
+      },
+      "priority": { "type": "string", "enum": ["P0", "P1", "P2"] },
+      "request": {
+        "type": "object",
+        "required": ["method", "path"],
+        "properties": {
+          "method": { "type": "string", "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] },
+          "path": { "type": "string", "description": "相对路径，可含 {{var}} 占位符" },
+          "query": { "type": "object", "description": "查询参数键值对" },
+          "headers": { "type": "object", "description": "额外请求头；token 用 {{token}} 占位符，禁止写死" },
+          "json": { "type": ["object", "array"], "description": "JSON 请求体" },
+          "form": { "type": "object", "description": "表单请求体" },
+          "raw": { "type": "string", "description": "原始请求体，用于测非法 JSON 等场景" }
+        }
+      },
+      "assertions": {
+        "type": "array",
+        "minItems": 1,
+        "description": "至少包含一条强断言（status eq / json_schema / json_path eq）",
+        "items": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": { "type": "string", "enum": ["status", "json_path", "json_schema", "header", "response_time_ms", "body_contains"] },
+            "op": { "type": "string", "enum": ["eq", "ne", "in", "lt", "lte", "gt", "gte", "contains", "type", "exists", "not_empty", "matches"] },
+            "path": { "type": "string", "description": "json_path 类型用，如 $.data.items[0].id" },
+            "name": { "type": "string", "description": "header 类型用" },
+            "value": { "description": "期望值" },
+            "schema_ref": { "type": "string", "description": "json_schema 类型用，如 #/components/schemas/Error" },
+            "schema": { "type": "object", "description": "json_schema 类型用，内联的简化 schema：{required:[], properties:{}}" }
+          }
+        }
+      },
+      "setup": {
+        "type": "array",
+        "description": "前置步骤，按顺序执行；用 capture 抽取变量供后续占位符使用",
+        "items": {
+          "type": "object",
+          "required": ["request"],
+          "properties": {
+            "request": { "$ref": "#/items/properties/request" },
+            "capture": { "type": "object", "description": "变量名 -> json_path，如 {\"order_id\": \"$.data.id\"}" }
+          }
+        }
+      },
+      "teardown": {
+        "type": "array",
+        "description": "清理步骤，必须存在（写操作用例）；失败时登记残留",
+        "items": { "$ref": "#/items/properties/request" }
+      },
+      "unique_prefix": {
+        "type": "string",
+        "description": "资源名前缀，建议 autotest_{{run_id}}_"
+      },
+      "expect_status": {
+        "type": "integer",
+        "description": "可选，便于快速阅读；实际判定以 assertions 为准"
+      },
+      "notes": { "type": "string", "description": "用例意图说明，便于人工审阅" }
+    }
+  }
+}

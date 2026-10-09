@@ -1,0 +1,93 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "示例订单服务", "version": "1.0.0" },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/api/v1/orders": {
+      "post": {
+        "tags": ["order"],
+        "summary": "创建订单",
+        "operationId": "createOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productId", "quantity", "price"],
+                "properties": {
+                  "productId": { "type": "string", "minLength": 1, "maxLength": 64 },
+                  "quantity": { "type": "integer", "minimum": 1, "maximum": 9999 },
+                  "price": { "type": "number", "minimum": 0.01 },
+                  "currency": { "type": "string", "enum": ["CNY", "USD"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "data"],
+                  "properties": {
+                    "code": { "type": "integer" },
+                    "data": {
+                      "type": "object",
+                      "required": ["orderId", "status"],
+                      "properties": {
+                        "orderId": { "type": "string" },
+                        "status": { "type": "string", "enum": ["CREATED", "PAID", "CLOSED"] }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "参数非法" },
+          "401": { "description": "未鉴权" },
+          "409": { "description": "订单已存在" }
+        }
+      }
+    },
+    "/api/v1/orders/{orderId}": {
+      "get": {
+        "tags": ["order"],
+        "summary": "查询订单",
+        "operationId": "getOrder",
+        "parameters": [
+          { "name": "orderId", "in": "path", "required": true,
+            "schema": { "type": "string", "minLength": 1 } }
+        ],
+        "responses": {
+          "200": { "description": "查询成功" },
+          "401": { "description": "未鉴权" },
+          "404": { "description": "订单不存在" }
+        }
+      },
+      "delete": {
+        "tags": ["order"],
+        "summary": "删除订单",
+        "operationId": "deleteOrder",
+        "parameters": [
+          { "name": "orderId", "in": "path", "required": true,
+            "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "删除成功" },
+          "401": { "description": "未鉴权" },
+          "404": { "description": "订单不存在" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer" }
+    }
+  }
+}
