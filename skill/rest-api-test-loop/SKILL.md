@@ -1,6 +1,6 @@
 ---
 name: rest-api-test-loop
-description: 对后台服务的 REST 接口执行「生成用例 → 实跑验证 → 归因 → 修复 → 复跑」闭环。基于 OpenAPI/Swagger 契约生成黑盒 HTTP 用例，用源码仓交叉校验契约并定位根因，在开发环境实跑；把失败分类为产品缺陷 / 用例缺陷 / 环境噪声 / flaky，用例缺陷自动修复，产品缺陷定位到 file:line 后交人工确认。当用户要求测接口、生成接口测试用例、验证 API 契约、排查失败用例、跑接口回归时使用。
+description: 对后台服务的 REST 接口执行「生成用例 → 实跑验证 → 归因 → 修复 → 复跑」闭环，典型场景是开发人员自测新开发的接口（提测/合码前）。基于 OpenAPI/Swagger 契约生成黑盒 HTTP 用例，用源码仓交叉校验契约并定位根因，在开发环境实跑；把失败分类为产品缺陷 / 用例缺陷 / 环境噪声 / flaky，用例缺陷自动修复，产品缺陷定位到 file:line 后交人工确认。当用户要求测接口、自测新开发的接口、生成接口测试用例、验证 API 契约、排查失败用例、跑接口回归时使用。
 agent_created: true
 version: 0.2.0
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(python:*)
